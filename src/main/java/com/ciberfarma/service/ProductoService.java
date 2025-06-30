@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -44,14 +45,14 @@ public class ProductoService {
             productos = productoRepository.findAll();
         }
 
-        // Filtro por categoría
+        // Filtro por categoría (mutable)
         if (idCategoria != null) {
             productos = productos.stream()
-            		.filter(p -> p.getIdCategoria().getIdCategoria().equals(idCategoria)) // ✅ Correct
-                    .toList();
+                    .filter(p -> p.getIdCategoria().getIdCategoria().equals(idCategoria))
+                    .collect(Collectors.toList()); // ✅ mutable
         }
 
-        // Ordenamiento
+        // Ordenamiento (solo funciona si la lista es mutable)
         if ("precioAsc".equals(tipoOrden)) {
             productos.sort(Comparator.comparing(Producto::getPrecio));
         } else if ("precioDesc".equals(tipoOrden)) {
@@ -60,5 +61,6 @@ public class ProductoService {
 
         return productos;
     }
+
 
 }

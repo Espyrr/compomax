@@ -13,9 +13,9 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Login
-    public Usuario login(String usuario, String clave) {
-        return usuarioRepository.findByUsuarioAndClave(usuario, clave).orElse(null);
+    // Login con correo
+    public Usuario login(String correo, String clave) {
+        return usuarioRepository.findByCorreoAndClave(correo, clave).orElse(null);
     }
 
     // Guardar o actualizar usuario
@@ -23,12 +23,12 @@ public class UsuarioService {
         usuarioRepository.save(u);
     }
 
-    // Verificar si el nombre de usuario ya existe
-    public boolean existeUsuario(String usuario) {
-        return usuarioRepository.existsByUsuario(usuario);
+    // Verificar si el correo ya existe
+    public boolean existeUsuario(String correo) {
+        return usuarioRepository.existsByCorreo(correo);
     }
 
-    // Obtener por ID (opcional si lo usas)
+    // Obtener usuario por ID
     public Optional<Usuario> obtenerPorId(int id) {
         return usuarioRepository.findById(id);
     }

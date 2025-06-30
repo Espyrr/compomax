@@ -135,23 +135,23 @@
             </form>
         </div>
         <div class="user-actions">
-            <div th:if="${session.usuarioLogueado != null}">
-                <span class="welcome-text">Bienvenid@ <span th:text="${session.usuarioLogueado.nombre}"></span></span>
-                <form th:action="@{/logout}" method="get" style="margin: 0;">
-                    <button type="submit" class="logout-button">Cerrar sesión</button>
-                </form>
-            </div>
+			<div th:if="${session.usuarioLogueado != null}" class="d-flex align-items-center gap-2">
+			    <span class="welcome-text">Bienvenid@&nbsp;<span th:text="${session.usuarioLogueado.nombre}"></span></span>
+				<form th:action="@{/usuario/logout}" method="get" style="margin: 0;">
+				    <button type="submit" class="logout-button">Cerrar sesión</button>
+				</form>
+			</div>
             <div th:if="${session.usuarioLogueado == null}">
-                <a th:href="@{/login}">
-                    <button class="login-button">Iniciar sesión</button>
-                </a>
+				<a th:href="@{/usuario/login}">
+				    <button class="login-button">Iniciar sesión</button>
+				</a>
             </div>
-            <div class="cart-container">
-                <a th:href="@{/carrito}" class="cart-icon">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <sup th:text="${session.cantArticulos}">0</sup>
-                </a>
-            </div>
+			<div class="cart-container">
+			    <a th:href="@{/carrito}" class="cart-icon">
+			        <i class="fa-solid fa-cart-shopping"></i>
+			        <sup th:text="${session.cantArticulos}">0</sup>
+			    </a>
+			</div>
         </div>
     </div>
 </div>

@@ -24,6 +24,7 @@ public class BoletaController {
     @Autowired
     private BoletaService boletaService;
 
+    
     @GetMapping
     public String listarBoletas(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
@@ -32,16 +33,16 @@ public class BoletaController {
         }
 
         List<Boleta> boletas;
-        if (usuario.getTipo().getIdTipo() == 1) {
-            // Admin: todas las boletas
+        if (usuario.getIdTipo().getIdTipo() == 1) {
+            // Admin todas las boletas
             boletas = boletaService.listarTodos();
         } else {
-            // Cliente: solo sus boletas
+            // cliente solo sus boletas
             boletas = boletaService.listarPorUsuario(usuario);
         }
 
         model.addAttribute("boletas", boletas);
-        return "boletas/listado"; // Thymeleaf: listado.html
+        return "boletas/listado"; //listado.html
     }
 
     @GetMapping("/{id}/pdf")
@@ -56,7 +57,7 @@ public class BoletaController {
         }
 
         Boleta boleta = boletaService.obtenerPorId(id).orElse(null);
-        if (boleta == null || (usuario.getTipo().getIdTipo() != 1 && !boleta.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()))) {
+        if (boleta == null || (usuario.getIdTipo().getIdTipo() != 1 && !boleta.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()))) {
             response.sendRedirect("/boletas");
             return;
         }
@@ -65,7 +66,7 @@ public class BoletaController {
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(List.of(boleta));
 
         Map<String, Object> params = new HashMap<>();
-        params.put("logoPath", new ClassPathResource("logo.png").getInputStream()); // si tienes logo
+        params.put("logoPath", new ClassPathResource("logo.png").getInputStream()); // por si usamos el logo
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperStream, params, dataSource);
 

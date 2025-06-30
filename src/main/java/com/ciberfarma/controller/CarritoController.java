@@ -29,6 +29,25 @@ public class CarritoController {
 
     @Autowired
     private DetalleBoletaService detalleBoletaService;
+    
+    @GetMapping
+    public String mostrarCarrito(HttpSession session, org.springframework.ui.Model model) {
+        List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
+        if (carrito == null) {
+            carrito = new ArrayList<>();
+        }
+
+        // Calcular total
+        BigDecimal total = carrito.stream()
+                .map(DetalleBoleta::getImporte)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("carrito", carrito);
+        model.addAttribute("total", total);
+
+        return "carrito"; // Asegúrate de que el archivo se llama carrito.html y está en templates/
+    }
+
 
     @GetMapping("/agregar/{idProducto}")
     public String agregarProducto(@PathVariable("idProducto") String idProducto,
@@ -61,7 +80,12 @@ public class CarritoController {
             }
         }
 
+        // ✅ Guardar el carrito y la cantidad total en sesión
         session.setAttribute("carrito", carrito);
+        session.setAttribute("cantArticulos", carrito.stream()
+                .mapToInt(DetalleBoleta::getCantidad)
+                .sum());
+
         return "redirect:" + (referer != null ? referer : "/");
     }
 
@@ -75,9 +99,15 @@ public class CarritoController {
             carrito.removeIf(item -> item.getProducto().getIdProducto().equals(idProducto));
         }
 
+        // ✅ Guardar el carrito actualizado y la nueva cantidad
         session.setAttribute("carrito", carrito);
+        session.setAttribute("cantArticulos", carrito.stream()
+                .mapToInt(DetalleBoleta::getCantidad)
+                .sum());
+
         return "redirect:" + (referer != null ? referer : "/");
     }
+
 
     @GetMapping("/finalizar")
     public String finalizarCompra(HttpSession session) {
@@ -127,4 +157,5 @@ public class CarritoController {
         session.removeAttribute("carrito");
         return "redirect:/?success=compra";
     }
+    
 }

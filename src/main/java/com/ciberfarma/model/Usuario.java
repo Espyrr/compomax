@@ -1,9 +1,12 @@
 package com.ciberfarma.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Entity
@@ -25,8 +28,10 @@ public class Usuario {
     private String apellido;
 
     @Column(name = "usuario")
-    private String usuario;
+    private String correo;
 
+    @NotBlank(message = "La clave es obligatoria")
+    @Size(max = 5, message = "La clave no puede tener más de 5 caracteres")
     @Column(name = "clave")
     private String clave;
 
@@ -35,5 +40,5 @@ public class Usuario {
 
     @ManyToOne
     @JoinColumn(name = "tipo")
-    private Tipo tipo;
+    private Tipo idTipo;
 }
