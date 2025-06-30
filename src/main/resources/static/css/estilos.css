@@ -1,0 +1,72 @@
+
+
+/*  aside */
+aside {
+	width: 25%;
+	padding: 20px;
+}
+/*img principal */
+.productos, .destacado, .ingresos {
+    width: 100%;  
+    height: auto; 
+    object-fit: cover;  
+}
+
+/*  aside izquierda  */
+aside h3 {
+	padding: 20px 0px;
+}
+
+aside a {
+	padding: 5px 0px;
+	display: block;
+	color: firebrick;
+}
+
+/*  aside derecha  */
+aside img {
+	width: 70%;
+	margin: 20px auto;
+	display: block;
+}
+
+/*  section  */
+section {
+  width: 100%;
+  padding: 10px; 
+  text-align: center; 
+  background-color: white;
+  
+}
+section h1 {
+  width: 100%;
+  font-size: 2rem; 
+  margin: 0 0 0 20px; 
+  
+}
+
+section figure {
+  display: inline-block; 
+  width: 15%; 
+  margin: 45px; 
+}
+
+section figure img {
+	width: 100%;
+	height: auto;
+	object-fit: contain;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+section figure img:hover {
+  transform: scale(1.05); 
+}
+
+/* Efecto al hacer clic */
+section figure img:active {
+  transform: scale(1.1); 
+}
+
+section figure figcaption {
+	margin-top: 10px;
+	font-size: 16px;
+}

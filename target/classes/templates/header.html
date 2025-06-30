@@ -1,0 +1,120 @@
+<div th:fragment="header">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #banner {
+            width: 100%;
+            height: 390px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carrusel-imagen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .carrusel-imagen.active {
+            opacity: 1;
+        }
+
+        .banner-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 255, 0.7);
+            border: 2px solid #fff;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #prev {
+            left: 20px;
+        }
+
+        #next {
+            right: 20px;
+        }
+
+        .banner-btn:hover {
+            background-color: rgba(0, 0, 255, 0.9);
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+
+    <div id="banner">
+        <img class="carrusel-imagen active" th:src="@{/img/banner.jpg}" alt="Imagen 1">
+        <img class="carrusel-imagen" th:src="@{/img/banner5.png}" alt="Imagen 2">
+        <img class="carrusel-imagen" th:src="@{/img/banner7.jpg}" alt="Imagen 3">
+        <img class="carrusel-imagen" th:src="@{/img/banner4.jpg}" alt="Imagen 4">
+        <img class="carrusel-imagen" th:src="@{/img/banner10.jpg}" alt="Imagen 5">
+
+        <button id="prev" class="banner-btn">&lt;</button>
+        <button id="next" class="banner-btn">&gt;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imagenes = document.querySelectorAll('.carrusel-imagen');
+            const btnPrev = document.getElementById('prev');
+            const btnNext = document.getElementById('next');
+            let indiceActual = 0;
+            let autoPlayInterval;
+
+            function mostrarImagen(indice) {
+                imagenes.forEach((img, i) => {
+                    img.classList.remove('active');
+                    if (i === indice) img.classList.add('active');
+                });
+            }
+
+            function mostrarSiguienteImagen() {
+                indiceActual = (indiceActual + 1) % imagenes.length;
+                mostrarImagen(indiceActual);
+            }
+
+            function mostrarImagenAnterior() {
+                indiceActual = (indiceActual - 1 + imagenes.length) % imagenes.length;
+                mostrarImagen(indiceActual);
+            }
+
+            function reiniciarAutoPlay() {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = setInterval(mostrarSiguienteImagen, 3000);
+            }
+
+            btnNext.addEventListener('click', () => {
+                mostrarSiguienteImagen();
+                reiniciarAutoPlay();
+            });
+
+            btnPrev.addEventListener('click', () => {
+                mostrarImagenAnterior();
+                reiniciarAutoPlay();
+            });
+
+            autoPlayInterval = setInterval(mostrarSiguienteImagen, 3000);
+        });
+    </script>
+</div>
