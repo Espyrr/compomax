@@ -31,7 +31,7 @@ public class CatalogoController {
         List<Producto> productos = productoService.obtenerFiltrados(tipoOrden, buscar, idCategoria);
 
         // Paginación
-        int productosPorPagina = 12;
+        int productosPorPagina = 15;
         int totalProductos = productos.size();
         int totalPaginas = (int) Math.ceil((double) totalProductos / productosPorPagina);
         int inicio = (pagina - 1) * productosPorPagina;

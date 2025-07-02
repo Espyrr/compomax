@@ -59,40 +59,56 @@ public class CarritoController {
             carrito = new ArrayList<>();
         }
 
-        boolean existe = false;
+        Producto producto = productoService.buscarPorCodigo(idProducto);
+        if (producto == null) {
+            session.setAttribute("mensaje", "Producto no encontrado.");
+            session.setAttribute("tipo", "danger");
+            return "redirect:" + (referer != null ? referer : "/");
+        }
+
+        // Buscar si ya está en el carrito
+        DetalleBoleta itemExistente = null;
         for (DetalleBoleta item : carrito) {
             if (item.getProducto().getIdProducto().equals(idProducto)) {
-                item.setCantidad(item.getCantidad() + 1);
-                item.setImporte(item.getProducto().getPrecio().multiply(BigDecimal.valueOf(item.getCantidad())));
-                existe = true;
+                itemExistente = item;
                 break;
             }
         }
 
-        if (!existe) {
-            Producto producto = productoService.buscarPorCodigo(idProducto);
-            if (producto != null) {
-                DetalleBoleta detalle = new DetalleBoleta();
-                detalle.setProducto(producto);
-                detalle.setCantidad(1);
-                detalle.setImporte(producto.getPrecio());
-                carrito.add(detalle);
-            }
+        // Calcular la cantidad actual + 1
+        int cantidadSolicitada = (itemExistente != null ? itemExistente.getCantidad() + 1 : 1);
+
+        // Validar contra el stock
+        if (cantidadSolicitada > producto.getStock()) {
+            session.setAttribute("mensaje", "No hay suficiente stock disponible para el producto: " + producto.getDescripcion());
+            session.setAttribute("tipo", "warning");
+            return "redirect:" + (referer != null ? referer : "/");
         }
 
-     // ✅ Guardar el carrito y la cantidad total en sesión
+        // Agregar o actualizar
+        if (itemExistente != null) {
+            itemExistente.setCantidad(cantidadSolicitada);
+            itemExistente.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidadSolicitada)));
+        } else {
+            DetalleBoleta detalle = new DetalleBoleta();
+            detalle.setProducto(producto);
+            detalle.setCantidad(1);
+            detalle.setImporte(producto.getPrecio());
+            carrito.add(detalle);
+        }
+
+        // Guardar en sesión
         session.setAttribute("carrito", carrito);
         session.setAttribute("cantArticulos", carrito.stream()
                 .mapToInt(DetalleBoleta::getCantidad)
                 .sum());
 
-        // ✅ Mostrar alerta
         session.setAttribute("mensaje", "Producto agregado exitosamente al carrito.");
         session.setAttribute("tipo", "success");
 
         return "redirect:" + (referer != null ? referer : "/");
-
     }
+
 
     @GetMapping("/eliminar/{idProducto}")
     public String eliminarProducto(@PathVariable("idProducto") String idProducto,

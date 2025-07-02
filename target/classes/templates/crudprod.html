@@ -18,10 +18,10 @@
     <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
 
     <form class="row g-3" th:action="@{/productos/guardar}" method="post" enctype="multipart/form-data">
-	  <div class="col-md-6">
-	    <label class="form-label">Código</label>
-	    <input type="text" class="form-control" th:field="*{producto.idProducto}" placeholder="P0000" pattern="[Pp][0-9]{4}" required/>
-	  </div>
+      <div class="col-md-6">
+        <label class="form-label">Código</label>
+        <input type="text" class="form-control" th:field="*{producto.idProducto}" placeholder="P0000" pattern="[Pp][0-9]{4}" required readonly th:value="${producto.idProducto}"/>
+      </div>
 
       <div class="col-md-6">
         <label class="form-label">Descripción</label>
@@ -46,6 +46,11 @@
                   th:selected="${producto.idCategoria?.idCategoria} == ${cat.idCategoria}">
           </option>
         </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Imagen del producto</label>
+        <input type="file" name="imagen" class="form-control" th:attr="required=${!modoEdicion}" accept="image/*"/>
       </div>
 
       <div class="col-12">
@@ -76,17 +81,17 @@
         <tbody>
           <tr th:each="p : ${lstProductos}">
             <td>
-              <img th:src="@{'/img/productos/' + ${p.idProducto} + '.jpg?' + ${#dates.createNow().time}}"
-                   onerror="this.src='/img/productos/vacio.jpg'" width="80px">
+				<img th:src="@{'/productos/' + ${p.idProducto} + '.jpg'}"
+				     onerror="this.src='/productos/vacio.jpg'" width="80px">
             </td>
             <td th:text="${p.idProducto}"></td>
             <td th:text="${p.descripcion}"></td>
             <td th:text="${p.stock}"></td>
-            <td th:text="'S/. ' + ${#numbers.formatDecimal(p.precio, 1, 'POINT', 2, 'POINT')}"></td>
+			<td th:text="'S/. ' + ${#numbers.formatDecimal(p.precio, 0, 'NONE', 2, 'POINT')}"></td>
             <td th:text="${p.idCategoria.descripcion}"></td>
             <td>
               <a th:href="@{'/productos/editar/' + ${p.idProducto}}" class="btn btn-info mb-1">Editar</a>
-			  <button type="button" class="btn btn-danger" th:attr="data-codigo=${p.idProducto}" onclick="confirmarEliminacion(this)">Eliminar</button>
+              <button type="button" class="btn btn-danger" th:attr="data-codigo=${p.idProducto}" onclick="confirmarEliminacion(this)">Eliminar</button>
             </td>
           </tr>
           <tr th:if="${#lists.isEmpty(lstProductos)}">
@@ -100,21 +105,21 @@
   <div th:replace="~{footer :: footer}"></div>
 
   <script>
-	function confirmarEliminacion(boton) {
-	  const codigo = boton.getAttribute('data-codigo'); // <-- aquí está la clave
-	  Swal.fire({
-	    title: '¿Está seguro?',
-	    text: 'Se eliminará el producto con código ' + codigo,
-	    icon: 'warning',
-	    showCancelButton: true,
-	    confirmButtonText: 'Sí, eliminar',
-	    cancelButtonText: 'No, cancelar'
-	  }).then((result) => {
-	    if (result.isConfirmed) {
-	      window.location.href = '/productos/eliminar/' + codigo;
-	    }
-	  });
-	}
+  function confirmarEliminacion(boton) {
+    const codigo = boton.getAttribute('data-codigo');
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: 'Se eliminará el producto con código ' + codigo,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No, cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/productos/eliminar/' + codigo;
+      }
+    });
+  }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

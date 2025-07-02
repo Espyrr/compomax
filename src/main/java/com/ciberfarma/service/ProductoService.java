@@ -61,6 +61,25 @@ public class ProductoService {
 
         return productos;
     }
+    public String generarSiguienteCodigo() {
+        List<String> codigosExistentes = productoRepository.findAll().stream()
+            .map(Producto::getIdProducto)
+            .filter(cod -> cod.matches("[Pp]\\d{4}"))
+            .map(cod -> cod.toUpperCase())
+            .collect(Collectors.toList());
+
+        // Buscar el primer código libre desde P0001 a P9999
+        for (int i = 1; i <= 9999; i++) {
+            String codigo = String.format("P%04d", i);
+            if (!codigosExistentes.contains(codigo)) {
+                return codigo;
+            }
+        }
+
+        // Si no hay disponibles, devuelve null o lanza excepción
+        return null;
+    }
+
 
 
 }

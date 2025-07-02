@@ -117,13 +117,16 @@
     <div class="producto-container">
 		<div class="producto" th:each="producto : ${lstProductos}">
 		    <a th:href="@{'/muestra?codigo=' + ${producto.idProducto}}">
-		        <img th:src="@{'/img/productos/' + ${producto.idProducto} + '.jpg?' + ${#dates.createNow().time}}"
+		        <img th:src="@{'/productos/' + ${producto.idProducto} + '.jpg?' + ${#dates.createNow().time}}"
 		             th:alt="${producto.descripcion}" />
 		    </a>
 		    <h3 th:text="${producto.descripcion}"></h3>
-		    <p class="precio">
-		        S/. <span th:text="${#numbers.formatDecimal(producto.precio, 0, 'NONE', 2, 'POINT')}"></span>
-		    </p>
+			<p class="precio" th:switch="${session.moneda}">
+				<span th:if="${session.moneda == 'USD'}"
+				      th:text="'$ ' + ${#numbers.formatDecimal(producto.precio * 0.28, 0, 'NONE', 2, 'POINT')}"></span>
+				<span th:if="${session.moneda != 'USD'}"
+				      th:text="'S/. ' + ${#numbers.formatDecimal(producto.precio, 0, 'NONE', 2, 'POINT')}"></span>
+			</p>
 		    <p class="stock">Stock: <span th:text="${producto.stock}"></span></p>
 		    <p class="categoria">Categoría: <span th:text="${producto.idCategoria.descripcion}"></span></p>
 		    <a th:href="@{'/carrito/agregar/' + ${producto.idProducto}}" class="btn btn-info btn-sm">Agregar al carrito</a>

@@ -1,17 +1,20 @@
 package com.ciberfarma.controller;
 
 import com.ciberfarma.model.Producto;
-import com.ciberfarma.model.Categoria;
 import com.ciberfarma.model.Usuario;
-import com.ciberfarma.service.ProductoService;
 import com.ciberfarma.service.CategoriaService;
+import com.ciberfarma.service.ProductoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.util.List;
 
 @Controller
@@ -37,9 +40,12 @@ public class ProductoController {
                 ? productoService.buscarPorDescripcion(buscar.trim())
                 : productoService.listarTodos();
 
+        Producto nuevoProducto = new Producto();
+        nuevoProducto.setIdProducto(productoService.generarSiguienteCodigo());
+
         model.addAttribute("lstProductos", productos);
         model.addAttribute("lstCategorias", categoriaService.listarTodos());
-        model.addAttribute("producto", new Producto());
+        model.addAttribute("producto", nuevoProducto);
         model.addAttribute("modoEdicion", false);
 
         return "crudprod";
@@ -69,6 +75,7 @@ public class ProductoController {
 
     @PostMapping("/guardar")
     public String guardarProducto(@ModelAttribute Producto producto,
+                                  @RequestParam("imagen") MultipartFile imagen,
                                   RedirectAttributes redirectAttrs,
                                   HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
@@ -78,7 +85,24 @@ public class ProductoController {
 
         try {
             productoService.guardar(producto);
+
+            if (!imagen.isEmpty()) {
+                String fileName = producto.getIdProducto() + ".jpg";
+                Path uploadDir = Paths.get("uploads/productos");
+
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                try (InputStream inputStream = imagen.getInputStream()) {
+                    Path filePath = uploadDir.resolve(fileName);
+                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+
             redirectAttrs.addFlashAttribute("mensaje", "Producto guardado correctamente");
+        } catch (IOException e) {
+            redirectAttrs.addFlashAttribute("error", "Error al guardar la imagen: " + e.getMessage());
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
         }
@@ -114,5 +138,12 @@ public class ProductoController {
         model.addAttribute("producto", producto);
         return "compra";
     }
+    @PostMapping("/cambiar-moneda")
+    public String cambiarMoneda(@RequestParam("moneda") String moneda, HttpSession session,
+                                 @RequestHeader(value = "referer", required = false) String referer) {
+        session.setAttribute("moneda", moneda);
+        return "redirect:" + (referer != null ? referer : "/");
+    }
 }
+
 
