@@ -1,5 +1,15 @@
 <div th:fragment="footer">
     <style>
+		html, body {
+		    height: 100%;
+		    margin: 0;
+		    padding: 0;
+		}
+
+		body {
+		    display: flex;
+		    flex-direction: column;
+		}
         .footer {
             background-color: #002366;
             color: white;
@@ -8,6 +18,7 @@
             flex-wrap: wrap;
             justify-content: space-between;
             font-family: Arial, sans-serif;
+			margin-top: auto;
         }
         .footer-column {
             margin-bottom: 20px;

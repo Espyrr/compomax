@@ -136,7 +136,7 @@ public class ProductoController {
             return "redirect:/catalogo";
         }
         model.addAttribute("producto", producto);
-        return "compra";
+        return "muestra";
     }
     @PostMapping("/cambiar-moneda")
     public String cambiarMoneda(@RequestParam("moneda") String moneda, HttpSession session,

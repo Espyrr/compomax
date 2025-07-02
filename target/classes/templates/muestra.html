@@ -33,11 +33,12 @@
     </style>
 </head>
 <body class="bg-light">
-
+	<div th:replace="cabecera :: cabecera"></div>
+	<div th:replace="menu_nav :: menu_nav"></div>
 <div class="producto-detalle row">
     <!-- Imagen del producto -->
     <div class="col-md-6">
-        <img th:src="@{'/img/productos/' + ${producto.idProducto} + '.jpg'}" alt="Imagen del producto" class="producto-img">
+        <img th:src="@{'/productos/' + ${producto.idProducto} + '.jpg'}" alt="Imagen del producto" class="producto-img">
     </div>
 
     <!-- Detalles del producto -->
@@ -45,17 +46,20 @@
         <h3 th:text="${producto.descripcion}">Nombre del Producto</h3>
 
         <ul class="list-unstyled mt-3">
-            <li><strong>Categoría:</strong> <span th:text="${producto.categoria.descripcion}"></span></li>
+            <li><strong>Categoría:</strong><span th:text="${producto.idCategoria.descripcion}"></span></li>
             <li><strong>Código:</strong> <span th:text="${producto.idProducto}"></span></li>
             <li><strong>Estado:</strong> Nuevo</li>
             <li><strong>En stock:</strong> <span th:text="${producto.stock}"></span> artículos</li>
         </ul>
 
-        <p class="mt-3" th:text="${producto.detalle}">Descripción larga del producto...</p>
-
-        <form th:action="@{/carrito/agregar/{idProducto}(idProducto=${producto.idProducto})}" method="get">
-            <button type="submit" class="btn btn-agregar btn-lg">Agregar al carrito</button>
-        </form>
+		<form th:action="@{/carrito/agregar/{idProducto}(idProducto=${producto.idProducto})}" method="post">
+		    <div class="mb-3">
+		        <label for="cantidad" class="form-label"><strong>Cantidad:</strong></label>
+		        <input type="number" id="cantidad" name="cantidad" class="form-control w-25"
+		               min="1" th:attr="max=${producto.stock}" value="1" required>
+		    </div>
+		    <button type="submit" class="btn btn-agregar btn-lg">Agregar al carrito</button>
+		</form>
 
         <div class="precio mt-4" th:if="${session.moneda} == 'PEN'">
             S/ <span th:text="${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'NONE')}"></span>
@@ -65,6 +69,6 @@
         </div>
     </div>
 </div>
-
+<div th:replace="footer :: footer"></div>
 </body>
 </html>

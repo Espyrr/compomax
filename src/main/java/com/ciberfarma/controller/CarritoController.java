@@ -49,8 +49,9 @@ public class CarritoController {
     }
 
 
-    @GetMapping("/agregar/{idProducto}")
+    @PostMapping("/agregar/{idProducto}")
     public String agregarProducto(@PathVariable("idProducto") String idProducto,
+                                  @RequestParam("cantidad") int cantidad,
                                   HttpSession session,
                                   @RequestHeader(value = "referer", required = false) String referer) {
 
@@ -75,38 +76,38 @@ public class CarritoController {
             }
         }
 
-        // Calcular la cantidad actual + 1
-        int cantidadSolicitada = (itemExistente != null ? itemExistente.getCantidad() + 1 : 1);
+        int cantidadTotal = cantidad;
+        if (itemExistente != null) {
+            cantidadTotal += itemExistente.getCantidad();
+        }
 
         // Validar contra el stock
-        if (cantidadSolicitada > producto.getStock()) {
+        if (cantidadTotal > producto.getStock()) {
             session.setAttribute("mensaje", "No hay suficiente stock disponible para el producto: " + producto.getDescripcion());
             session.setAttribute("tipo", "warning");
             return "redirect:" + (referer != null ? referer : "/");
         }
 
-        // Agregar o actualizar
         if (itemExistente != null) {
-            itemExistente.setCantidad(cantidadSolicitada);
-            itemExistente.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidadSolicitada)));
+            itemExistente.setCantidad(cantidadTotal);
+            itemExistente.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidadTotal)));
         } else {
             DetalleBoleta detalle = new DetalleBoleta();
             detalle.setProducto(producto);
-            detalle.setCantidad(1);
-            detalle.setImporte(producto.getPrecio());
+            detalle.setCantidad(cantidad);
+            detalle.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidad)));
             carrito.add(detalle);
         }
 
-        // Guardar en sesión
         session.setAttribute("carrito", carrito);
         session.setAttribute("cantArticulos", carrito.stream()
                 .mapToInt(DetalleBoleta::getCantidad)
                 .sum());
 
-        session.setAttribute("mensaje", "Producto agregado exitosamente al carrito.");
+        session.setAttribute("mensaje", "Producto añadido exitosamente al carrito.");
         session.setAttribute("tipo", "success");
 
-        return "redirect:" + (referer != null ? referer : "/");
+        return "redirect:/catalogo"; // redirige al catálogo como pediste
     }
 
 
