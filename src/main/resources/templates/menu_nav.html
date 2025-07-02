@@ -5,9 +5,23 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <style>
+    .navbar {
+      background-color: #1c1c1c;
+    }
+
+    .navbar-nav {
+      margin: 0 auto; /* Centra horizontalmente el menú */
+      display: flex;
+      justify-content: center;
+      gap: 30px; /* Espacio entre elementos */
+    }
+
     .nav-link {
       font-weight: bold;
       font-size: 17px;
+      color: white !important;
+      padding: 10px 15px;
+      transition: all 0.2s ease-in-out;
     }
 
     .nav-link:hover {
@@ -17,18 +31,14 @@
       border-radius: 5px;
     }
 
-    .navbar {
-      background-color: #1c1c1c;
-    }
-
     .dropdown-menu a {
       color: black;
     }
   </style>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <div class="container-fluid justify-content-center">
+      <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link" th:href="@{/catalogo(categoria=8)}">Monitores</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/catalogo(categoria=9)}">Periféricos PC</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/catalogo(categoria=2)}">Tarjetas Gráficas</a></li>
@@ -42,13 +52,10 @@
             Mantenimientos
           </a>
           <ul class="dropdown-menu" aria-labelledby="mantenimientoDropdown">
-			<li><a class="dropdown-item" th:href="@{/productos}">Productos</a></li>
+            <li><a class="dropdown-item" th:href="@{/productos}">Productos</a></li>
           </ul>
         </li>
       </ul>
     </div>
   </nav>
-
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </div>
-

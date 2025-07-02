@@ -80,13 +80,18 @@ public class CarritoController {
             }
         }
 
-        // ✅ Guardar el carrito y la cantidad total en sesión
+     // ✅ Guardar el carrito y la cantidad total en sesión
         session.setAttribute("carrito", carrito);
         session.setAttribute("cantArticulos", carrito.stream()
                 .mapToInt(DetalleBoleta::getCantidad)
                 .sum());
 
+        // ✅ Mostrar alerta
+        session.setAttribute("mensaje", "Producto agregado exitosamente al carrito.");
+        session.setAttribute("tipo", "success");
+
         return "redirect:" + (referer != null ? referer : "/");
+
     }
 
     @GetMapping("/eliminar/{idProducto}")
@@ -157,5 +162,15 @@ public class CarritoController {
         session.removeAttribute("carrito");
         return "redirect:/?success=compra";
     }
-    
+    @Controller
+    public class MensajeController {
+
+        @PostMapping("/limpiar-mensaje")
+        @ResponseBody
+        public void limpiarMensaje(HttpSession session) {
+            session.removeAttribute("mensaje");
+            session.removeAttribute("tipo");
+        }
+    }
+
 }

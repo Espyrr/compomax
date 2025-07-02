@@ -8,9 +8,10 @@
 
         #banner {
             width: 100%;
-            height: 390px;
+            height: 520px;
             position: relative;
             overflow: hidden;
+			background-color: #000; /* ✅ evita el parpadeo blanco */
         }
 
         .carrusel-imagen {
@@ -21,55 +22,61 @@
             left: 0;
             opacity: 0;
             transition: opacity 1s ease-in-out;
+            z-index: 0;
         }
 
         .carrusel-imagen.active {
             opacity: 1;
+            z-index: 1;
         }
 
-        .banner-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background-color: rgba(0, 0, 255, 0.7);
-            border: 2px solid #fff;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 10;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+		.banner-btn {
+		    position: absolute;
+		    top: 50%;
+		    transform: translateY(-50%);
+		    width: 50px;
+		    height: 80px;
+		    background-color: rgba(0, 0, 0, 0.4);
+		    color: white;
+		    font-size: 28px;
+		    font-weight: normal; /* antes tenía bold: eso hace que salte al hacer hover */
+		    cursor: pointer;
+		    z-index: 10;
+		    border: none;
+		    border-radius: 0;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    box-shadow: none;
+		    transition: background-color 0.3s ease;
+		}
 
-        #prev {
-            left: 20px;
-        }
+		#prev {
+		    left: 15px;
+		}
 
-        #next {
-            right: 20px;
-        }
+		#next {
+		    right: 15px;
+		}
 
-        .banner-btn:hover {
-            background-color: rgba(0, 0, 255, 0.9);
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
+		.banner-btn:hover {
+		    background-color: rgba(0, 0, 0, 0.6);
+		    transform: translateY(-50%); /* ⚠️ evita que el hover afecte el layout */
+		}
     </style>
 
     <div id="banner">
-        <img class="carrusel-imagen active" th:src="@{/img/banner.jpg}" alt="Imagen 1">
-        <img class="carrusel-imagen" th:src="@{/img/banner5.png}" alt="Imagen 2">
-        <img class="carrusel-imagen" th:src="@{/img/banner7.jpg}" alt="Imagen 3">
-        <img class="carrusel-imagen" th:src="@{/img/banner4.jpg}" alt="Imagen 4">
-        <img class="carrusel-imagen" th:src="@{/img/banner10.jpg}" alt="Imagen 5">
-
+        <img class="carrusel-imagen active" th:src="@{/img/banner1.jpg}" alt="Imagen 1">
+        <img class="carrusel-imagen" th:src="@{/img/banner2.png}" alt="Imagen 2">
+		<img class="carrusel-imagen" th:src="@{/img/banner1.png}" alt="Imagen 3">
+		<img class="carrusel-imagen" th:src="@{/img/periferico.jpg}" alt="Imagen 4">
+		<img class="carrusel-imagen" th:src="@{/img/rambanner.jpg}" alt="Imagen 5">
+		<img class="carrusel-imagen" th:src="@{/img/kingston.jpg}" alt="Imagen 6">
+		<img class="carrusel-imagen" th:src="@{/img/esteintel.png}" alt="Imagen 7">
+        <img class="carrusel-imagen" th:src="@{/img/ryzencpu.jpg}" alt="Imagen 8">
+		<img class="carrusel-imagen" th:src="@{/img/cases.jpg}" alt="Imagen 9">
+		<img class="carrusel-imagen" th:src="@{/img/psu.jpg}" alt="Imagen 10">
+		<img class="carrusel-imagen" th:src="@{/img/banner7.png}" alt="Imagen 11">
         <button id="prev" class="banner-btn">&lt;</button>
         <button id="next" class="banner-btn">&gt;</button>
     </div>
@@ -85,8 +92,8 @@
             function mostrarImagen(indice) {
                 imagenes.forEach((img, i) => {
                     img.classList.remove('active');
-                    if (i === indice) img.classList.add('active');
                 });
+                imagenes[indice].classList.add('active');
             }
 
             function mostrarSiguienteImagen() {
@@ -101,7 +108,7 @@
 
             function reiniciarAutoPlay() {
                 clearInterval(autoPlayInterval);
-                autoPlayInterval = setInterval(mostrarSiguienteImagen, 3000);
+                autoPlayInterval = setInterval(mostrarSiguienteImagen, 10000);
             }
 
             btnNext.addEventListener('click', () => {
@@ -114,7 +121,8 @@
                 reiniciarAutoPlay();
             });
 
-            autoPlayInterval = setInterval(mostrarSiguienteImagen, 3000);
+            autoPlayInterval = setInterval(mostrarSiguienteImagen, 10000);
         });
     </script>
 </div>
+

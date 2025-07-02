@@ -155,7 +155,10 @@
         icon: '[[${session.tipo}]]',
         title: 'Aviso',
         text: '[[${session.mensaje}]]'
+    }).then(() => {
+        fetch('/limpiar-mensaje', { method: 'POST' });
     });
 </script>
+
 </body>
 </html>

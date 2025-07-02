@@ -14,11 +14,9 @@
   <main class="container bg-white p-4 rounded">
     <h1 class="text-center mb-4">Mantenimiento de Productos</h1>
 
-    <!-- Mensaje de éxito -->
     <div th:if="${mensaje != null}" class="alert alert-success" th:text="${mensaje}"></div>
     <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
 
-    <!-- Formulario Producto -->
     <form class="row g-3" th:action="@{/productos/guardar}" method="post" enctype="multipart/form-data">
 	  <div class="col-md-6">
 	    <label class="form-label">Código</label>
