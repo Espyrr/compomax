@@ -133,61 +133,45 @@ public class CarritoController {
 
     @GetMapping("/finalizar")
     public String finalizarCompra(HttpSession session) {
-
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
-            return "redirect:/login";
+            session.setAttribute("mensaje", "Debe iniciar sesión o registrarse para finalizar la compra.");
+            session.setAttribute("tipo", "warning");
+            return "redirect:/carrito";
         }
+
 
         List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
         if (carrito == null || carrito.isEmpty()) {
-            return "redirect:/";
+            session.setAttribute("mensaje", "No hay productos en el carrito.");
+            session.setAttribute("tipo", "warning");
+            return "redirect:/carrito";
         }
 
-        // Calcular montos
-        BigDecimal subtotal = carrito.stream()
-                .map(DetalleBoleta::getImporte)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal igv = subtotal.multiply(new BigDecimal("0.18"));
-        BigDecimal total = subtotal.add(igv);
-
-        // Crear boleta
-        Boleta boleta = new Boleta();
-        boleta.setUsuario(usuario);
-        boleta.setFechaBoleta(LocalDateTime.now());
-        boleta.setSubtotal(subtotal);
-        boleta.setIgv(igv);
-        boleta.setTotal(total);
-        boletaService.guardar(boleta);
-
-        // Asignar boleta a cada detalle y actualizar stock
+        // Descontar stock
         for (DetalleBoleta item : carrito) {
-            item.setBoleta(boleta);
-
-            // Descontar stock del producto
             Producto producto = item.getProducto();
             int nuevoStock = producto.getStock() - item.getCantidad();
             producto.setStock(nuevoStock);
-            productoService.guardar(producto); // debe tener un método guardar(Product)
+            productoService.guardar(producto);
         }
 
-        // Guardar todos los detalles
-        detalleBoletaService.guardarDetalles(carrito);
+        session.setAttribute("mensaje", "Compra exitosa. ¡Vuelva pronto!");
+        session.setAttribute("tipo", "success");
 
-        // Limpiar carrito
         session.removeAttribute("carrito");
-        return "redirect:/?success=compra";
-    }
-    @Controller
-    public class MensajeController {
+        session.removeAttribute("cantArticulos");
 
-        @PostMapping("/limpiar-mensaje")
-        @ResponseBody
-        public void limpiarMensaje(HttpSession session) {
-            session.removeAttribute("mensaje");
-            session.removeAttribute("tipo");
-        }
+        return "redirect:/carrito";
     }
+
+    
+    @PostMapping("/limpiar-mensaje")
+    @ResponseBody
+    public void limpiarMensaje(HttpSession session) {
+        session.removeAttribute("mensaje");
+        session.removeAttribute("tipo");
+    }
+
 
 }
