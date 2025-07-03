@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/usuario")
 public class UsuarioController {
@@ -20,6 +22,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    // --- LOGIN Y PERFIL (NO CAMBIA) ---
     @GetMapping("/login")
     public String mostrarFormularioLogin(HttpSession session,
                                          Model model,
@@ -28,15 +31,12 @@ public class UsuarioController {
             return "redirect:/";
         }
 
-        // Si hay un mensaje flash, pásalo explícitamente al modelo
         if (mensaje != null && !mensaje.isEmpty()) {
             model.addAttribute("mensaje", mensaje);
         }
 
         return "login";
     }
-
-
 
     @PostMapping("/login")
     public String procesarLogin(@RequestParam("correo") String correo,
@@ -52,14 +52,41 @@ public class UsuarioController {
             return "login";
         }
     }
-    // logout
+
     @GetMapping("/logout")
     public String cerrarSesion(HttpSession session) {
         session.invalidate();
         return "redirect:/";
     }
 
-    // formulario de registro
+    @GetMapping("/perfil")
+    public String mostrarPerfil(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/usuario/login";
+        }
+        model.addAttribute("usuario", usuario);
+        return "perfil";
+    }
+
+    @PostMapping("/perfil")
+    public String actualizarPerfil(@ModelAttribute Usuario usuarioActualizado,
+                                   HttpSession session,
+                                   Model model) {
+        Usuario usuarioSesion = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuarioSesion == null) {
+            return "redirect:/usuario/login";
+        }
+
+        usuarioActualizado.setIdUsuario(usuarioSesion.getIdUsuario());
+        usuarioActualizado.setIdTipo(usuarioSesion.getIdTipo());
+        usuarioService.guardar(usuarioActualizado);
+        session.setAttribute("usuarioLogueado", usuarioActualizado);
+        model.addAttribute("mensaje", "Perfil actualizado con éxito");
+        return "perfil";
+    }
+
+    // --- REGISTRO USUARIO NORMAL (NO ADMIN) ---
     @GetMapping("/registro")
     public String mostrarFormularioRegistro(Model model) {
         Usuario nuevoUsuario = new Usuario();
@@ -83,44 +110,87 @@ public class UsuarioController {
         }
 
         Tipo tipoCliente = new Tipo();
-        tipoCliente.setIdTipo(2);
+        tipoCliente.setIdTipo(2); // Tipo Cliente
         usuario.setIdTipo(tipoCliente);
 
         usuarioService.guardar(usuario);
-
         redirectAttributes.addFlashAttribute("mensaje", "Registro exitoso. Ahora puede iniciar sesión.");
         return "redirect:/usuario/login";
     }
 
-
-
-    // formulario de perfil
-    @GetMapping("/perfil")
-    public String mostrarPerfil(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) {
-            return "redirect:/usuario/login";
+    // --- CRUD ADMIN: USUARIOS ---
+    @GetMapping
+    public String listarUsuarios(@RequestParam(name = "pagina", defaultValue = "1") int pagina,
+                                 Model model, HttpSession session) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || u.getIdTipo().getIdTipo() != 1) {
+            return "redirect:/acceso-denegado";
         }
-        model.addAttribute("usuario", usuario);
-        return "perfil";
+
+        List<Usuario> usuarios = usuarioService.listarTodos();
+        int porPagina = 10;
+        int total = usuarios.size();
+        int totalPaginas = (int) Math.ceil((double) total / porPagina);
+        int inicio = (pagina - 1) * porPagina;
+        int fin = Math.min(inicio + porPagina, total);
+        List<Usuario> usuariosPagina = usuarios.subList(inicio, fin);
+
+        model.addAttribute("lstUsuarios", usuariosPagina);
+        model.addAttribute("lstTipos", usuarioService.listarTipos());
+        model.addAttribute("usuario", new Usuario());
+        model.addAttribute("modoEdicion", false);
+        model.addAttribute("paginaActual", pagina);
+        model.addAttribute("totalPaginas", totalPaginas);
+
+        return "crudusuario";
     }
 
-    // actualizar perfil
-    @PostMapping("/perfil")
-    public String actualizarPerfil(@ModelAttribute Usuario usuarioActualizado,
-                                   HttpSession session,
-                                   Model model) {
-        Usuario usuarioSesion = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuarioSesion == null) {
-            return "redirect:/usuario/login";
+    @GetMapping("/editar/{id}")
+    public String editarUsuario(@PathVariable("id") Integer id, Model model, HttpSession session) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || u.getIdTipo().getIdTipo() != 1) {
+            return "redirect:/acceso-denegado";
         }
 
-        usuarioActualizado.setIdUsuario(usuarioSesion.getIdUsuario());
-        usuarioActualizado.setIdTipo(usuarioSesion.getIdTipo()); // mantener tipo
-        usuarioService.guardar(usuarioActualizado);
-        session.setAttribute("usuarioLogueado", usuarioActualizado);
-        model.addAttribute("mensaje", "Perfil actualizado con éxito");
-        return "perfil";
+        Usuario usuario = usuarioService.obtenerPorId(id).orElse(null);
+        if (usuario == null) {
+            return "redirect:/usuario";
+        }
+
+        model.addAttribute("lstUsuarios", usuarioService.listarTodos());
+        model.addAttribute("lstTipos", usuarioService.listarTipos());
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("modoEdicion", true);
+        return "crudusuario";
+    }
+
+    @PostMapping("/guardar")
+    public String guardarUsuario(@ModelAttribute Usuario usuario,
+                                 RedirectAttributes redirect) {
+        try {
+            usuarioService.guardar(usuario);
+            redirect.addFlashAttribute("mensaje", "Usuario guardado correctamente.");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
+        }
+        return "redirect:/usuario";
+    }
+
+    @GetMapping("/eliminar/{id}")
+    public String eliminarUsuario(@PathVariable("id") Integer id,
+                                  RedirectAttributes redirect, HttpSession session) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || u.getIdTipo().getIdTipo() != 1) {
+            return "redirect:/acceso-denegado";
+        }
+
+        try {
+            usuarioService.eliminar(id);
+            redirect.addFlashAttribute("mensaje", "Usuario eliminado correctamente.");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
+        }
+        return "redirect:/usuario";
     }
 }
 
