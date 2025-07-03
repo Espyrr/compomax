@@ -56,6 +56,12 @@
 				<li><strong>Estado:</strong> Nuevo</li>
 				<li><strong>En stock:</strong> <span th:text="${producto.stock}"></span> artículos</li>
 			</ul>
+			<div class="precio mt-4" th:switch="${session.moneda}">
+				<span th:case="'USD'"
+					th:text="'$ ' + ${#numbers.formatDecimal(producto.precio * 0.28, 0, 'NONE', 2, 'POINT')}"></span>
+				<span th:case="*"
+					th:text="'S/. ' + ${#numbers.formatDecimal(producto.precio, 0, 'NONE', 2, 'POINT')}"></span>
+			</div>
 
 			<form th:action="@{/carrito/agregar/{idProducto}(idProducto=${producto.idProducto})}" method="post">
 				<div class="mb-3">
@@ -65,13 +71,6 @@
 				</div>
 				<button type="submit" class="btn btn-agregar btn-lg">Agregar al carrito</button>
 			</form>
-
-			<div class="precio mt-4" th:if="${session.moneda} == 'PEN'">
-				S/ <span th:text="'$ ' + ${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'NONE')}"></span>
-			</div>
-			<div class="precio mt-4" th:if="${session.moneda} == 'USD'">
-				$ <span th:text="'$ ' + ${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'NONE')}"></span>
-			</div>
 		</div>
 	</div>
 	<div th:replace="footer :: footer"></div>
