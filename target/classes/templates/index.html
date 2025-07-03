@@ -80,11 +80,12 @@
 				flex: 0 0 20%;
 				max-width: 20%;
 			}
-		.img-fluid {
-			width: 1200px;
-			height: 300px;
+
+			.img-fluid {
+				width: 1200px;
+				height: 300px;
 			}
-			
+
 		}
 	</style>
 </head>
@@ -96,7 +97,6 @@
 
 	<main class="container py-4">
 
-		<!-- SECCIÓN NUEVOS INGRESOS -->
 		<section class="mb-5">
 			<h2 class="seccion-titulo">Nuevos Ingresos</h2>
 			<div class="row">
@@ -120,21 +120,19 @@
 				</div>
 			</div>
 		</section>
-		
-		<!-- MINI BANNERS ENTRE NUEVOS INGRESOS Y TARJETAS -->
-		<div class="row justify-content-center mb-4">
-				    <div class="col-md-6 mb-3">
-				        <img src="/img/rtxbanner.jpg" class="img-fluid rounded shadow-sm" alt="Banner 3">
-				    </div>
-				    <div class="col-md-6 mb-3">
-				        <img src="/img/rxbanner.jpg" class="img-fluid rounded shadow-sm" alt="Banner 4">
-				    </div>
-				</div>
 
-		<!-- SECCIÓN TARJETAS DE VIDEO RTX -->
+		<div class="row justify-content-center mb-4">
+			<div class="col-md-6 mb-3">
+				<img src="/img/rtxbanner.jpg" class="img-fluid rounded shadow-sm" alt="Banner 3">
+			</div>
+			<div class="col-md-6 mb-3">
+				<img src="/img/rxbanner.jpg" class="img-fluid rounded shadow-sm" alt="Banner 4">
+			</div>
+		</div>
+
 		<section class="mb-5">
 			<div class="d-flex justify-content-between align-items-center seccion-titulo">
-			    <span>Tarjetas de Video</span>
+				<span>Tarjetas de Video</span>
 				<a class="btn btn-outline-danger btn-sm" th:href="@{/catalogo(categoria=2)}">Ver más</a>
 			</div>
 			<div class="row">
@@ -158,19 +156,19 @@
 				</div>
 			</div>
 		</section>
-		
+
 		<div class="row justify-content-center mb-4">
-						    <div class="col-md-6 mb-3">
-						        <img src="/img/monitor.jpg" class="img-fluid rounded shadow-sm" alt="Banner 3">
-						    </div>
-						    <div class="col-md-6 mb-3">
-						        <img src="/img/ramban.jpg" class="img-fluid rounded shadow-sm" alt="Banner 4">
-						    </div>
-						</div>
-		<!-- SECCIÓN MONITORES GAMING -->
+			<div class="col-md-6 mb-3">
+				<img src="/img/monitor.jpg" class="img-fluid rounded shadow-sm" alt="Banner 3">
+			</div>
+			<div class="col-md-6 mb-3">
+				<img src="/img/ramban.jpg" class="img-fluid rounded shadow-sm" alt="Banner 4">
+			</div>
+		</div>
+
 		<section class="mb-5">
 			<div class="d-flex justify-content-between align-items-center seccion-titulo">
-			    <span>Monitores Gaming</span>
+				<span>Monitores Gaming</span>
 				<a class="btn btn-outline-danger btn-sm" th:href="@{/catalogo(categoria=3)}">Ver más</a>
 			</div>
 			<div class="row">
@@ -195,20 +193,18 @@
 			</div>
 		</section>
 
-		<!-- MINI BANNERS ENTRE MONITORES Y PROCESADORES -->
 		<div class="row justify-content-center mb-4">
-		    <div class="col-md-6 mb-3">
-		        <img src="/img/logitech.jpg" class="img-fluid rounded shadow-sm" alt="Banner 3">
-		    </div>
-		    <div class="col-md-6 mb-3">
-		        <img src="/img/bannershort.jpg" class="img-fluid rounded shadow-sm" alt="Banner 4">
-		    </div>
+			<div class="col-md-6 mb-3">
+				<img src="/img/logitech.jpg" class="img-fluid rounded shadow-sm" alt="Banner 3">
+			</div>
+			<div class="col-md-6 mb-3">
+				<img src="/img/bannershort.jpg" class="img-fluid rounded shadow-sm" alt="Banner 4">
+			</div>
 		</div>
-		
-		<!-- SECCIÓN PROCESADORES -->
+
 		<section class="mb-5">
 			<div class="d-flex justify-content-between align-items-center seccion-titulo">
-			    <span>Procesadores</span>
+				<span>Procesadores</span>
 				<a class="btn btn-outline-danger btn-sm" th:href="@{/catalogo(categoria=4)}">Ver más</a>
 			</div>
 			<div class="row">

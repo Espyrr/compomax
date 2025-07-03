@@ -21,59 +21,56 @@ import java.util.Map;
 @RequestMapping("/boletas")
 public class BoletaController {
 
-    @Autowired
-    private BoletaService boletaService;
+	@Autowired
+	private BoletaService boletaService;
 
-    
-    @GetMapping
-    public String listarBoletas(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) {
-            return "redirect:/login";
-        }
+	@GetMapping
+	public String listarBoletas(HttpSession session, Model model) {
+		Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+		if (usuario == null) {
+			return "redirect:/login";
+		}
 
-        List<Boleta> boletas;
-        if (usuario.getIdTipo().getIdTipo() == 1) {
-            // Admin todas las boletas
-            boletas = boletaService.listarTodos();
-        } else {
-            // cliente solo sus boletas
-            boletas = boletaService.listarPorUsuario(usuario);
-        }
+		List<Boleta> boletas;
+		if (usuario.getIdTipo().getIdTipo() == 1) {
+			boletas = boletaService.listarTodos();
+		} else {
+			boletas = boletaService.listarPorUsuario(usuario);
+		}
 
-        model.addAttribute("boletas", boletas);
-        return "boletas/listado"; //listado.html
-    }
+		model.addAttribute("boletas", boletas);
+		return "boletas/listado"; 
+	}
 
-    @GetMapping("/{id}/pdf")
-    public void verPdf(@PathVariable("id") Integer id,
-                       HttpSession session,
-                       jakarta.servlet.http.HttpServletResponse response) throws Exception {
+	@GetMapping("/{id}/pdf")
+	public void verPdf(@PathVariable("id") Integer id, HttpSession session,
+			jakarta.servlet.http.HttpServletResponse response) throws Exception {
 
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) {
-            response.sendRedirect("/login");
-            return;
-        }
+		Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+		if (usuario == null) {
+			response.sendRedirect("/login");
+			return;
+		}
 
-        Boleta boleta = boletaService.obtenerPorId(id).orElse(null);
-        if (boleta == null || (usuario.getIdTipo().getIdTipo() != 1 && !boleta.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()))) {
-            response.sendRedirect("/boletas");
-            return;
-        }
+		Boleta boleta = boletaService.obtenerPorId(id).orElse(null);
+		if (boleta == null || (usuario.getIdTipo().getIdTipo() != 1
+				&& !boleta.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()))) {
+			response.sendRedirect("/boletas");
+			return;
+		}
 
-        InputStream jasperStream = new ClassPathResource("reporte_boleta.jasper").getInputStream();
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(List.of(boleta));
+		InputStream jasperStream = new ClassPathResource("reporte_boleta.jasper").getInputStream();
+		JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(List.of(boleta));
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("logoPath", new ClassPathResource("logo.png").getInputStream()); // por si usamos el logo
+		Map<String, Object> params = new HashMap<>();
+		params.put("logoPath", new ClassPathResource("logo.png").getInputStream()); 
 
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperStream, params, dataSource);
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperStream, params, dataSource);
 
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "inline; filename=boleta_" + id + ".pdf");
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "inline; filename=boleta_" + id + ".pdf");
 
-        JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
-    }
+		JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
+	}
 
 }

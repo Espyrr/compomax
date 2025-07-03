@@ -34,22 +34,20 @@ public class UsuarioService {
         return usuarioRepository.existsByCorreo(correo);
     }
 
-    // Obtener usuario por ID
     public Optional<Usuario> obtenerPorId(int id) {
         return usuarioRepository.findById(id);
     }
 
-    // Listar todos los usuarios (para CRUD)
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
-    // Eliminar usuario por ID
+    // Eliminar usuario 
     public void eliminar(Integer id) {
         usuarioRepository.deleteById(id);
     }
 
-    // Listar todos los tipos (para combo)
+    // Listar todos los tipos 
     public List<Tipo> listarTipos() {
         return tipoRepository.findAll();
     }

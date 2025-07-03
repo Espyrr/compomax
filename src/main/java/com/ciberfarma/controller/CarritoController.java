@@ -21,157 +21,141 @@ import java.util.List;
 @RequestMapping("/carrito")
 public class CarritoController {
 
-    @Autowired
-    private ProductoService productoService;
+	@Autowired
+	private ProductoService productoService;
 
-    @Autowired
-    private BoletaService boletaService;
+	@Autowired
+	private BoletaService boletaService;
 
-    @Autowired
-    private DetalleBoletaService detalleBoletaService;
-    
-    @GetMapping
-    public String mostrarCarrito(HttpSession session, org.springframework.ui.Model model) {
-        List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
-        if (carrito == null) {
-            carrito = new ArrayList<>();
-        }
+	@Autowired
+	private DetalleBoletaService detalleBoletaService;
 
-        // Calcular total
-        BigDecimal total = carrito.stream()
-                .map(DetalleBoleta::getImporte)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+	@GetMapping
+	public String mostrarCarrito(HttpSession session, org.springframework.ui.Model model) {
+		List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
+		if (carrito == null) {
+			carrito = new ArrayList<>();
+		}
 
-        model.addAttribute("carrito", carrito);
-        model.addAttribute("total", total);
+		// Calcular total
+		BigDecimal total = carrito.stream().map(DetalleBoleta::getImporte).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return "carrito"; // Asegúrate de que el archivo se llama carrito.html y está en templates/
-    }
+		model.addAttribute("carrito", carrito);
+		model.addAttribute("total", total);
 
+		return "carrito";
+	}
 
-    @PostMapping("/agregar/{idProducto}")
-    public String agregarProducto(@PathVariable("idProducto") String idProducto,
-                                  @RequestParam("cantidad") int cantidad,
-                                  HttpSession session,
-                                  @RequestHeader(value = "referer", required = false) String referer) {
+	@PostMapping("/agregar/{idProducto}")
+	public String agregarProducto(@PathVariable("idProducto") String idProducto, @RequestParam("cantidad") int cantidad,
+			HttpSession session, @RequestHeader(value = "referer", required = false) String referer) {
 
-        List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
-        if (carrito == null) {
-            carrito = new ArrayList<>();
-        }
+		List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
+		if (carrito == null) {
+			carrito = new ArrayList<>();
+		}
 
-        Producto producto = productoService.buscarPorCodigo(idProducto);
-        if (producto == null) {
-            session.setAttribute("mensaje", "Producto no encontrado.");
-            session.setAttribute("tipo", "danger");
-            return "redirect:" + (referer != null ? referer : "/");
-        }
+		Producto producto = productoService.buscarPorCodigo(idProducto);
+		if (producto == null) {
+			session.setAttribute("mensaje", "Producto no encontrado.");
+			session.setAttribute("tipo", "danger");
+			return "redirect:" + (referer != null ? referer : "/");
+		}
 
-        // Buscar si ya está en el carrito
-        DetalleBoleta itemExistente = null;
-        for (DetalleBoleta item : carrito) {
-            if (item.getProducto().getIdProducto().equals(idProducto)) {
-                itemExistente = item;
-                break;
-            }
-        }
+		DetalleBoleta itemExistente = null;
+		for (DetalleBoleta item : carrito) {
+			if (item.getProducto().getIdProducto().equals(idProducto)) {
+				itemExistente = item;
+				break;
+			}
+		}
 
-        int cantidadTotal = cantidad;
-        if (itemExistente != null) {
-            cantidadTotal += itemExistente.getCantidad();
-        }
+		int cantidadTotal = cantidad;
+		if (itemExistente != null) {
+			cantidadTotal += itemExistente.getCantidad();
+		}
 
-        // Validar contra el stock
-        if (cantidadTotal > producto.getStock()) {
-            session.setAttribute("mensaje", "No hay suficiente stock disponible para el producto: " + producto.getDescripcion());
-            session.setAttribute("tipo", "warning");
-            return "redirect:" + (referer != null ? referer : "/");
-        }
+		// Validar contra el stock
+		if (cantidadTotal > producto.getStock()) {
+			session.setAttribute("mensaje",
+					"No hay suficiente stock disponible para el producto: " + producto.getDescripcion());
+			session.setAttribute("tipo", "warning");
+			return "redirect:" + (referer != null ? referer : "/");
+		}
 
-        if (itemExistente != null) {
-            itemExistente.setCantidad(cantidadTotal);
-            itemExistente.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidadTotal)));
-        } else {
-            DetalleBoleta detalle = new DetalleBoleta();
-            detalle.setProducto(producto);
-            detalle.setCantidad(cantidad);
-            detalle.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidad)));
-            carrito.add(detalle);
-        }
+		if (itemExistente != null) {
+			itemExistente.setCantidad(cantidadTotal);
+			itemExistente.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidadTotal)));
+		} else {
+			DetalleBoleta detalle = new DetalleBoleta();
+			detalle.setProducto(producto);
+			detalle.setCantidad(cantidad);
+			detalle.setImporte(producto.getPrecio().multiply(BigDecimal.valueOf(cantidad)));
+			carrito.add(detalle);
+		}
 
-        session.setAttribute("carrito", carrito);
-        session.setAttribute("cantArticulos", carrito.stream()
-                .mapToInt(DetalleBoleta::getCantidad)
-                .sum());
+		session.setAttribute("carrito", carrito);
+		session.setAttribute("cantArticulos", carrito.stream().mapToInt(DetalleBoleta::getCantidad).sum());
 
-        session.setAttribute("mensaje", "Producto añadido exitosamente al carrito.");
-        session.setAttribute("tipo", "success");
+		session.setAttribute("mensaje", "Producto añadido exitosamente al carrito.");
+		session.setAttribute("tipo", "success");
 
-        return "redirect:" + (referer != null ? referer : "/catalogo");
-    }
+		return "redirect:" + (referer != null ? referer : "/catalogo");
+	}
 
+	@GetMapping("/eliminar/{idProducto}")
+	public String eliminarProducto(@PathVariable("idProducto") String idProducto, HttpSession session,
+			@RequestHeader(value = "referer", required = false) String referer) {
 
-    @GetMapping("/eliminar/{idProducto}")
-    public String eliminarProducto(@PathVariable("idProducto") String idProducto,
-                                   HttpSession session,
-                                   @RequestHeader(value = "referer", required = false) String referer) {
+		List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
+		if (carrito != null) {
+			carrito.removeIf(item -> item.getProducto().getIdProducto().equals(idProducto));
+		}
 
-        List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
-        if (carrito != null) {
-            carrito.removeIf(item -> item.getProducto().getIdProducto().equals(idProducto));
-        }
+		session.setAttribute("carrito", carrito);
+		session.setAttribute("cantArticulos", carrito.stream().mapToInt(DetalleBoleta::getCantidad).sum());
 
-        // ✅ Guardar el carrito actualizado y la nueva cantidad
-        session.setAttribute("carrito", carrito);
-        session.setAttribute("cantArticulos", carrito.stream()
-                .mapToInt(DetalleBoleta::getCantidad)
-                .sum());
+		return "redirect:" + (referer != null ? referer : "/");
+	}
 
-        return "redirect:" + (referer != null ? referer : "/");
-    }
+	@GetMapping("/finalizar")
+	public String finalizarCompra(HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+		if (usuario == null) {
+			session.setAttribute("mensaje", "Debe iniciar sesión o registrarse para finalizar la compra.");
+			session.setAttribute("tipo", "warning");
+			return "redirect:/carrito";
+		}
 
+		List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
+		if (carrito == null || carrito.isEmpty()) {
+			session.setAttribute("mensaje", "No hay productos en el carrito.");
+			session.setAttribute("tipo", "warning");
+			return "redirect:/carrito";
+		}
 
-    @GetMapping("/finalizar")
-    public String finalizarCompra(HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) {
-            session.setAttribute("mensaje", "Debe iniciar sesión o registrarse para finalizar la compra.");
-            session.setAttribute("tipo", "warning");
-            return "redirect:/carrito";
-        }
+		// Descontar stock
+		for (DetalleBoleta item : carrito) {
+			Producto producto = item.getProducto();
+			int nuevoStock = producto.getStock() - item.getCantidad();
+			producto.setStock(nuevoStock);
+			productoService.guardar(producto);
+		}
 
+		session.setAttribute("mensaje", "Compra exitosa. ¡Vuelva pronto!");
+		session.setAttribute("tipo", "success");
 
-        List<DetalleBoleta> carrito = (List<DetalleBoleta>) session.getAttribute("carrito");
-        if (carrito == null || carrito.isEmpty()) {
-            session.setAttribute("mensaje", "No hay productos en el carrito.");
-            session.setAttribute("tipo", "warning");
-            return "redirect:/carrito";
-        }
+		session.removeAttribute("carrito");
+		session.removeAttribute("cantArticulos");
 
-        // Descontar stock
-        for (DetalleBoleta item : carrito) {
-            Producto producto = item.getProducto();
-            int nuevoStock = producto.getStock() - item.getCantidad();
-            producto.setStock(nuevoStock);
-            productoService.guardar(producto);
-        }
+		return "redirect:/carrito";
+	}
 
-        session.setAttribute("mensaje", "Compra exitosa. ¡Vuelva pronto!");
-        session.setAttribute("tipo", "success");
-
-        session.removeAttribute("carrito");
-        session.removeAttribute("cantArticulos");
-
-        return "redirect:/carrito";
-    }
-
-    
-    @PostMapping("/limpiar-mensaje")
-    @ResponseBody
-    public void limpiarMensaje(HttpSession session) {
-        session.removeAttribute("mensaje");
-        session.removeAttribute("tipo");
-    }
-
+	@PostMapping("/limpiar-mensaje")
+	@ResponseBody
+	public void limpiarMensaje(HttpSession session) {
+		session.removeAttribute("mensaje");
+		session.removeAttribute("tipo");
+	}
 
 }

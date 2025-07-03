@@ -19,12 +19,10 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    // ✅ Reemplazamos el nombre para que coincida con el del controller
     public Producto buscarPorCodigo(String id) {
         return productoRepository.findById(id).orElse(null);
     }
 
-    // ✅ Agregamos búsqueda por descripción (para el filtro)
     public List<Producto> buscarPorDescripcion(String descripcion) {
         return productoRepository.findByDescripcionContainingIgnoreCase(descripcion);
     }
@@ -45,14 +43,12 @@ public class ProductoService {
             productos = productoRepository.findAll();
         }
 
-        // Filtro por categoría (mutable)
         if (idCategoria != null) {
             productos = productos.stream()
                     .filter(p -> p.getIdCategoria().getIdCategoria().equals(idCategoria))
-                    .collect(Collectors.toList()); // ✅ mutable
+                    .collect(Collectors.toList()); 
         }
 
-        // Ordenamiento (solo funciona si la lista es mutable)
         if ("precioAsc".equals(tipoOrden)) {
             productos.sort(Comparator.comparing(Producto::getPrecio));
         } else if ("precioDesc".equals(tipoOrden)) {
@@ -68,7 +64,6 @@ public class ProductoService {
             .map(cod -> cod.toUpperCase())
             .collect(Collectors.toList());
 
-        // Buscar el primer código libre desde P0001 a P9999
         for (int i = 1; i <= 9999; i++) {
             String codigo = String.format("P%04d", i);
             if (!codigosExistentes.contains(codigo)) {
@@ -76,7 +71,6 @@ public class ProductoService {
             }
         }
 
-        // Si no hay disponibles, devuelve null o lanza excepción
         return null;
     }
 

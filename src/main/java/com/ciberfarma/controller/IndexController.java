@@ -26,28 +26,24 @@ public class IndexController {
                 .limit(10)
                 .collect(Collectors.toList());
 
-        // TARJETAS DE VIDEO - idCategoria = 2
         List<Producto> tarjetas = productoService.listarTodos()
                 .stream()
                 .filter(p -> p.getIdCategoria().getIdCategoria() == 2)
                 .limit(10)
                 .collect(Collectors.toList());
 
-        // MONITORES - idCategoria = 8
         List<Producto> monitores = productoService.listarTodos()
                 .stream()
                 .filter(p -> p.getIdCategoria().getIdCategoria() == 8)
                 .limit(10)
                 .collect(Collectors.toList());
 
-        // PROCESADORES - idCategoria = 1
         List<Producto> procesadores = productoService.listarTodos()
                 .stream()
                 .filter(p -> p.getIdCategoria().getIdCategoria() == 1)
                 .limit(10)
                 .collect(Collectors.toList());
 
-        // PASAR LAS VARIABLES CORRECTAS AL MODELO
         model.addAttribute("nuevos", nuevos);
         model.addAttribute("tarjetas", tarjetas);
         model.addAttribute("monitores", monitores);

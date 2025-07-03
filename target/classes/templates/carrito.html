@@ -47,10 +47,10 @@
 						<td th:text="${item.producto.idProducto}"></td>
 						<td th:text="${item.producto.descripcion}"></td>
 						<td th:switch="${session.moneda}">
-						    <span th:case="'USD'" 
-						          th:text="'$ ' + ${#numbers.formatDecimal(item.producto.precio * 0.28, 0, 'NONE', 2, 'POINT')}"></span>
-						    <span th:case="*" 
-						          th:text="'S/. ' + ${#numbers.formatDecimal(item.producto.precio, 0, 'NONE', 2, 'POINT')}"></span>
+							<span th:case="'USD'"
+								th:text="'$ ' + ${#numbers.formatDecimal(item.producto.precio * 0.28, 0, 'NONE', 2, 'POINT')}"></span>
+							<span th:case="*"
+								th:text="'S/. ' + ${#numbers.formatDecimal(item.producto.precio, 0, 'NONE', 2, 'POINT')}"></span>
 						</td>
 						<td th:text="${item.cantidad}"></td>
 						<td th:switch="${session.moneda}">
@@ -70,10 +70,10 @@
 					<tr>
 						<th colspan="4" class="text-end">Total:</th>
 						<th colspan="2" th:switch="${session.moneda}">
-						    <span th:case="'USD'" 
-						          th:text="'$ ' + ${#numbers.formatDecimal(total * 0.28, 0, 'NONE', 2, 'POINT')}"></span>
-						    <span th:case="*" 
-						          th:text="'S/. ' + ${#numbers.formatDecimal(total, 0, 'NONE', 2, 'POINT')}"></span>
+							<span th:case="'USD'"
+								th:text="'$ ' + ${#numbers.formatDecimal(total * 0.28, 0, 'NONE', 2, 'POINT')}"></span>
+							<span th:case="*"
+								th:text="'S/. ' + ${#numbers.formatDecimal(total, 0, 'NONE', 2, 'POINT')}"></span>
 						</th>
 					</tr>
 				</tfoot>
@@ -97,8 +97,8 @@
 				title: 'Aviso',
 				text: '[[${session.mensaje}]]'
 			});
-			await fetch('/carrito/limpiar-mensaje', { method: 'POST' });
-		})();
+			await fetch('/carrito/limpiar-mensaje', {method: 'POST'});
+		})();	
 	</script>
 
 
