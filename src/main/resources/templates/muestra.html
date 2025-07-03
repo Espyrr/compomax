@@ -62,10 +62,10 @@
 		</form>
 
         <div class="precio mt-4" th:if="${session.moneda} == 'PEN'">
-            S/ <span th:text="${#numbers.formatDecimal(producto.precioUnitario, 1, 'POINT', 2, 'NONE')}"></span>
+            S/ <span th:text="'$ ' + ${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'NONE')}"></span>
         </div>
         <div class="precio mt-4" th:if="${session.moneda} == 'USD'">
-            $ <span th:text="${#numbers.formatDecimal(producto.precioUnitarioUSD, 1, 'POINT', 2, 'NONE')}"></span>
+            $ <span th:text="'$ ' + ${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'NONE')}"></span>
         </div>
     </div>
 </div>
