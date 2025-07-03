@@ -172,7 +172,7 @@
 			<ul class="pagination justify-content-center">
 				<li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}"
 					th:classappend="${paginaActual == i} ? 'active'">
-					<form th:action="@{/catalogo}" method="post">
+					<form th:action="@{/catalogo}" method="get">
 						<input type="hidden" name="tipoOrden" th:value="${tipoOrden}" />
 						<input type="hidden" name="buscar" th:value="${busqueda}" />
 						<input type="hidden" name="categoria" th:value="${categoria}" />
