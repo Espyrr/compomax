@@ -157,8 +157,12 @@
 				</p>
 				<p class="stock">Stock: <span th:text="${producto.stock}"></span></p>
 				<p class="categoria">Categoría: <span th:text="${producto.idCategoria.descripcion}"></span></p>
-				<a th:href="@{'/carrito/agregar/' + ${producto.idProducto}}" class="btn btn-info btn-sm">Agregar al
-					carrito</a>
+				<form th:action="@{/carrito/agregar/{idProducto}(idProducto=${producto.idProducto})}" method="post" style="display:inline;">
+				    <input type="hidden" name="cantidad" value="1" />
+				    <button type="submit" class="btn btn-sm btn-outline-primary">
+				        <i class="fas fa-cart-plus"></i> Agregar al carrito
+				    </button>
+				</form>
 			</div>
 		</div>
 	</div>

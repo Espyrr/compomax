@@ -47,5 +47,6 @@ public class CatalogoController {
 
         return "catalogo";
     }
+
 }
 

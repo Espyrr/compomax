@@ -107,7 +107,7 @@ public class CarritoController {
         session.setAttribute("mensaje", "Producto añadido exitosamente al carrito.");
         session.setAttribute("tipo", "success");
 
-        return "redirect:/catalogo"; // redirige al catálogo como pediste
+        return "redirect:" + (referer != null ? referer : "/catalogo");
     }
 
 
